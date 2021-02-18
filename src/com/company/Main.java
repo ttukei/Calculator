@@ -14,6 +14,7 @@ public class Main {
     // TODO Implement the websiteBandwidth method
     // TODO Add test for invalid inputs: the program should print out a warning/error message and reject the inputs.
     // TODO complete BandwidthCalculatorTest class
+    // Some changes
     public static void main(String[] args) throws InputMismatchException {
         logger.setLevel(Level.WARNING);
         final String ANSI_CYAN = "\u001B[36m";
