@@ -1,170 +1,169 @@
 package com.company.controller;
 
-import java.util.*;
+import com.company.model.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class BandwidthCalculator extends Calculator{
+/**
+ * Performs bandwidth operations.
+ */
+public class BandwidthCalculator extends Calculator {
 
-    private double data;
-    private String unit;
-
-    public BandwidthCalculator(double data, String unit) {
-        this.data = data;
-        this.unit = unit;
-    }
-
-    public BandwidthCalculator(double data) {
-        this.data = data;
-    }
-
-    public BandwidthCalculator() {
-    }
-
-    public double getData() {
-        return data;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setData(double data) {
-        this.data = data;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public String toString() {
-        return "Data = " + this.getData() + "\nUnit = " + this.getUnit();
-    }
+    public BandwidthCalculator() {}
 
     /**
-     * Converts one unit of data to other units of data
+     * Converts data units.
      *
-     * @param data
-     * @param unit
-     * @return returns list of conversions for unit testing purposes
+     * @param data Value of data to be converted.
+     * @param unit Unit of data to be converted.
+     * @return collection of conversions of inputted data.
      */
-    public List<String> dataUnitConverter(double data, String unit) {
-        List<String> output = new ArrayList<>();
-        double bit = convertToBit(data, unit);
+    public Map<Data, Unit> dataUnitConverter(Data data, Unit unit) {
+        Map<Data, Unit> conversions = new HashMap<>();
+        Data bitValue = toBit(data, unit);
         double accumulator = 1000;
-        System.out.println(bit + " b");
-        String[] bits = {"kb", "mb", "gb", "tb"};
-        for (int i = 0; i < 4; i++) {
-            System.out.println(bit * 1/accumulator + " " + bits[i]);
+        conversions.put(bitValue, Unit.BIT);
+        Unit[] units = Unit.values();
+        for (int i = 1; i < 5; i++) {
+            conversions.put(new Data(bitValue.getData() * 1/accumulator), units[i]);
             accumulator *= 1000;
-            output.add(bit * 1/accumulator + " " + bits[i]);
         }
         accumulator = 1000;
-        String[] bytes = {"B", "KB", "MB", "GB", "TB"};
-        for (int i = 0; i < 5; i++) {
-            System.out.println(bit * 125.0/accumulator + " " +bytes[i]);
+        for (int i = 5; i < 9; i++) {
+            conversions.put(new Data(bitValue.getData() * 125.0/accumulator), units[i]);
             accumulator *= 1000;
-            output.add(bit * 125.0/accumulator + " " +bytes[i]);
         }
-        return output;
+        return conversions;
     }
 
     /**
+     * Calculates download/upload time given the data to upload and bandwidth.
      *
-     * @param fileSize
-     * @param fileUnit
-     * @param bandwidth
-     * @param bandwidthUnit
-     * @return returns minutes and seconds
+     * @param data Value of data to be uploaded/downloaded.
+     * @param unit Unit of data to be uploaded/downloaded.
+     * @param bandwidth Volume of information per unit of time.
+     * @return download and upload time
      */
-    public String downloadUploadTime(double fileSize, String fileUnit, double bandwidth, String bandwidthUnit) {
-        double seconds = (convertToByte(fileSize, fileUnit) * 8) / convertToBit(bandwidth, bandwidthUnit);
-        long remainingSeconds = (int) seconds % 60;
-        long minutes = (int) seconds / 60;
-        if (minutes > 0) {
-            return minutes + " minutes and " + remainingSeconds + " seconds";
+    public DownloadUploadTime downloadUploadTime(Data data, Unit unit, Bandwidth bandwidth) {
+        DownloadUploadTime time = new DownloadUploadTime();
+        time.setSeconds((toByte(data, unit).getData() * 8) / toBit(bandwidth.getData(), bandwidth.getUnit()).getData());
+        if (time.getSeconds() == 0) {
+            return time;
         } else {
-            return remainingSeconds + " seconds";
+            if (time.getSeconds() >= 86400) {
+                int days = (int) time.getSeconds()/86400;
+                double remainingHours = (time.getSeconds()%86400);
+                int hours = (int) remainingHours/3600;
+                double remainingMinutes = remainingHours % 3600;
+                int minutes = (int) remainingMinutes/60;
+                double seconds = remainingMinutes% 60;
+                time.setDays(days);
+                time.setHours(hours);
+                time.setMinutes(minutes);
+                time.setSeconds(seconds);
+            } else if (time.getSeconds() >= 3600) {
+                int hours = (int) time.getSeconds()/3600;
+                double remainingMinutes = time.getMinutes() % 3600;
+                int minutes = (int) remainingMinutes/60;
+                double seconds = remainingMinutes% 60;
+                time.setDays(0);
+                time.setHours(hours);
+                time.setMinutes(minutes);
+                time.setSeconds(seconds);
+            } else if (time.getSeconds() >= 60) {
+                int minutes = (int) time.getSeconds()/60;
+                double seconds = time.getSeconds()% 60;
+                time.setDays(0);
+                time.setHours(0);
+                time.setMinutes(minutes);
+                time.setSeconds(seconds);
+            } else {
+                time.setDays(0);
+                time.setHours(0);
+                time.setMinutes(0);
+            }
         }
+        return time;
     }
 
-    // Convert data unit to bits and return value
-    private double convertToBit(double data, String unit) {
-        switch (unit){
-            case "b":
-                return data;
-            case "kb":
-                return data * 1000;
-            case "mb":
-                return data * 1E+6;
-            case "gb":
-                return data * 1E+9;
-            case "tb":
-                return data * 1.0E+12;
-            case "B":
-                return data * 8;
-            case "KB":
-                return data * 8000;
-            case "MB":
-                return data * 8E+6;
-            case "GB":
-                return data * 8E+9;
-            case "TB":
-                return data * 8e+12;
-            default:
-                return -1;
-        }
+    /**
+     * Converts data to bit.
+     *
+     * @param data Value of data to be converted.
+     * @param unit Unit of data to be converted.
+     * @return bit value of inputted data
+     */
+    private Data toBit(Data data, Unit unit) {
+        return switch (unit) {
+            case BIT ->  new Data(data.getData());
+            case KILOBIT -> new Data(data.getData() * 0.001);
+            case MEGABIT -> new Data(data.getData() * 1.0E-6);
+            case GIGABIT -> new Data(data.getData() * 1.0E-9);
+            case TERABIT -> new Data(data.getData() * 1.0E-12);
+            case BYTE -> new Data(data.getData() * 0.125);
+            case KILOBYTE -> new Data(data.getData() * 0.000125);
+            case MEGABYTE -> new Data(data.getData() * 1.25E-7);
+            case GIGABYTE -> new Data(data.getData() * 1.25E-10);
+            case TERABYTE -> new Data(data.getData() * 1.25E-13);
+        };
     }
 
-    private double convertToByte(double data, String unit) {
-        switch (unit) {
-            case "B":
-                return data;
-            case "b":
-                return data/8;
-            case "kb":
-                return data * 125;
-            case "mb":
-                return data * 125000;
-            case "gb":
-                return data * 1.25E+8;
-            case "tb":
-                return data * 1.25E+11;
-            case "KB":
-                return data * 1000;
-            case "MB":
-                return data * 1E+6;
-            case "GB":
-                return data * 1E+9;
-            case "TB":
-                return data * 1E+12;
-            default:
-                return -1;
-        }
+    /**
+     * Converts data to byte.
+     *
+     * @param data Value of data to be converted.
+     * @param unit Unit of data to be converted.
+     * @return byte value of inputted data
+     */
+    private Data toByte(Data data, Unit unit) {
+        return switch (unit) {
+            case BYTE -> new Data(data.getData());
+            case BIT -> new Data(data.getData() * 0.125);
+            case KILOBIT -> new Data(data.getData() * 125);
+            case MEGABIT -> new Data(data.getData() * 125000);
+            case GIGABIT -> new Data(data.getData() * 1.25E+8);
+            case TERABIT -> new Data(data.getData() * 1.25E+11);
+            case KILOBYTE -> new Data(data.getData() * 1000);
+            case MEGABYTE -> new Data(data.getData() * 1E+6);
+            case GIGABYTE -> new Data(data.getData() * 1E+9);
+            case TERABYTE -> new Data(data.getData() * 1E+12);
+        };
     }
 
     // FIXME
-    public double websiteBandwidth(double avrPageViews, double avrPageSize, double redundancyFactor) {
+    /**
+     * Calculates website bandwidth given the websites statistics.
+     *
+     * @param websiteStats The websites page views, average page size, and redundancy factor;
+     * @return website bandwidth
+     */
+    public Bandwidth websiteBandwidth(WebsiteStats websiteStats, RedundancyFactor redundancyFactor) {
         // 1 page view per second == 0.008Mb/sec == 1,000 bytes average page size
         // 1 page view per second == 0.000008/sec == 1 byte
-       return avrPageSize * avrPageViews * 30 * redundancyFactor;
+        Bandwidth websiteBandwidth = new Bandwidth();
+        // websiteBandwidth.setData();
+        websiteBandwidth.setUnit(Unit.MEGABIT);
+       return websiteBandwidth;
     }
 
-    public double hostingBandwidthConverter(double monthlyUsage, String unit, String convertTo) {
-        double monthlyUsageInBytes = convertToByte(monthlyUsage, unit);
-        switch(convertTo) {
-            case "b":
-                return monthlyUsageInBytes * 3.0420564301468E-6;
-            case "kb":
-                return monthlyUsageInBytes * 3.0420564301468E-9;
-            case "mb":
-                return monthlyUsageInBytes * 3.0420564301468E-12;
-            case "gb":
-                return monthlyUsageInBytes * 3.0420564301468E-15;
-            case "tb":
-                return monthlyUsageInBytes * 3.0420564301468E-18;
-            default:
-                return -1;
-        }
-
+    /**
+     * Calculates the website bandwidth
+     *
+     * @param monthlyUsage Monthly data usage.
+     * @param monthlyUsageUnit Unit of monthly data usage.
+     * @param convertTo Unit of bandwidth to return.
+     * @return hosting bandwidth
+     */
+    public Bandwidth hostingBandwidthConverter(Data monthlyUsage, Unit monthlyUsageUnit, Unit convertTo) {
+        Data monthlyUsageInBytes = toByte(monthlyUsage, monthlyUsageUnit);
+        return switch (convertTo) {
+            case BIT -> new Bandwidth(new Data(monthlyUsageInBytes.getData() * 3.0420564301468E-6), Unit.BIT);
+            case KILOBIT -> new Bandwidth(new Data(monthlyUsageInBytes.getData() * 3.0420564301468E-9), Unit.KILOBIT);
+            case MEGABIT -> new Bandwidth(new Data(monthlyUsageInBytes.getData() * 3.0420564301468E-12), Unit.MEGABIT);
+            case GIGABIT -> new Bandwidth(new Data(monthlyUsageInBytes.getData() * 3.0420564301468E-15), Unit.GIGABIT);
+            case TERABIT -> new Bandwidth(new Data(monthlyUsageInBytes.getData() * 3.0420564301468E-18), Unit.TERABIT);
+            default -> throw new IllegalStateException("Unexpected value: " + convertTo);
+        };
     }
 
 }

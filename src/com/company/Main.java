@@ -12,7 +12,6 @@ public class Main {
     private static final Logger logger = Logger.getLogger("com.company");
 
     // TODO Implement the websiteBandwidth method
-    // TODO Add test for invalid inputs: the program should print out a warning/error message and reject the inputs.
     // TODO complete BandwidthCalculatorTest class
     public static void main(String[] args) throws InputMismatchException {
         logger.setLevel(Level.WARNING);
@@ -150,7 +149,7 @@ public class Main {
                                 double data = input.rawDouble();
                                 System.out.print("Enter a unit: ");
                                 String unit = input.unitValidator();
-                                bandwidthCalculator.dataUnitConverter(data, unit);
+                                // bandwidthCalculator.dataUnitConverter(data, unit);
                             } catch (InputMismatchException e) {
                                 logger.warning(e.getMessage());
                                 e.printStackTrace();
@@ -172,7 +171,7 @@ public class Main {
                                 System.out.println("Enter the bandwidth unit");
                                 System.out.print("b, kb, mb, gb, tb: ");
                                 String bandwidthUnit = input.unitValidator();
-                                System.out.println(bandwidthCalculator.downloadUploadTime(fileSize, fileSizeUnit, bandwidth, bandwidthUnit));
+                                // System.out.println(bandwidthCalculator.downloadUploadTime(fileSize, fileSizeUnit, bandwidth, bandwidthUnit));
                             } catch (InputMismatchException e) {
                                 logger.warning(e.getMessage());
                                 e.printStackTrace();
@@ -193,7 +192,7 @@ public class Main {
                                 System.out.println("Enter the redundancy factor: ");
                                 // double redundancyFactor = input.doubleNumberValidator();
                                 double redundancyFactor = input.rawDouble();
-                                bandwidthCalculator.websiteBandwidth(pageViews, pageSize, redundancyFactor);
+                                // bandwidthCalculator.websiteBandwidth(pageViews, pageSize, redundancyFactor);
                             } catch (InputMismatchException e) {
                                 logger.warning(e.getMessage());
                                 e.printStackTrace();
@@ -212,8 +211,8 @@ public class Main {
                                 System.out.println("Enter unit to convert to: ");
                                 System.out.print("b, kb, mb, gb, tb: ");
                                 String convertTo = input.unitValidator();
-                                System.out.println(bandwidthCalculator.hostingBandwidthConverter(monthlyUsage,
-                                        monthlyUsageUnit, convertTo));
+                                // System.out.println(bandwidthCalculator.hostingBandwidthConverter(monthlyUsage,
+                                //        monthlyUsageUnit, convertTo));
                             } catch (InputMismatchException e) {
                                 logger.warning(e.getMessage());
                                 e.printStackTrace();
