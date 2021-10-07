@@ -3,8 +3,18 @@ package com.company.controller;
 import com.company.model.Decimal;
 import com.company.model.Hexadecimal;
 
+/**
+ * Performs hexadecimal arithmetic operations and conversions.
+ */
 public class HexadecimalCalculator extends NumericCalculator implements HexadecimalCalcInterface{
 
+    /**
+     * Adds two hexadecimals.
+     *
+     * @param hex1 First hexadecimal.
+     * @param hex2 Second hexadecimal.
+     * @return Sum of two hexadecimal numbers.
+     */
     public Hexadecimal add(Hexadecimal hex1, Hexadecimal hex2) {
         double a = (hexadecimalToDecimal(hex1).getDecimal());
         double b = (hexadecimalToDecimal(hex2).getDecimal());
@@ -13,6 +23,13 @@ public class HexadecimalCalculator extends NumericCalculator implements Hexadeci
         return decimalToHexadecimal(decimal);
     }
 
+    /**
+     * Subtracts two hexadecimals.
+     *
+     * @param hex1 First hexadecimal.
+     * @param hex2 Second hexadecimal.
+     * @return Difference of two hexadecimal numbers.
+     */
     public Hexadecimal subtract(Hexadecimal hex1, Hexadecimal hex2) {
         double a = (hexadecimalToDecimal(hex1).getDecimal());
         double b = (hexadecimalToDecimal(hex2).getDecimal());
@@ -21,6 +38,13 @@ public class HexadecimalCalculator extends NumericCalculator implements Hexadeci
         return decimalToHexadecimal(decimal);
     }
 
+    /**
+     * Multiplies two hexadecimals.
+     *
+     * @param hex1 First hexadecimal.
+     * @param hex2 Second hexadecimal.
+     * @return Product of two hexadecimal numbers.
+     */
     public Hexadecimal multiply(Hexadecimal hex1, Hexadecimal hex2) {
         double a = (hexadecimalToDecimal(hex1).getDecimal());
         double b = (hexadecimalToDecimal(hex2).getDecimal());
@@ -29,6 +53,13 @@ public class HexadecimalCalculator extends NumericCalculator implements Hexadeci
         return decimalToHexadecimal(decimal);
     }
 
+    /**
+     * Divides two hexadecimals.
+     *
+     * @param hex1 First hexadecimal.
+     * @param hex2 Second hexadecimal.
+     * @return Ratio of two hexadecimal numbers.
+     */
     public Hexadecimal divide(Hexadecimal hex1, Hexadecimal hex2) {
         double a = (hexadecimalToDecimal(hex1).getDecimal());
         double b = (hexadecimalToDecimal(hex2).getDecimal());
@@ -38,15 +69,15 @@ public class HexadecimalCalculator extends NumericCalculator implements Hexadeci
     }
 
     /**
-     * Converts decimal to hexadecimal
+     * Converts decimal to hexadecimal.
      *
-     * @param decimal
-     * @return hexadecimal
+     * @param decimal Decimal to be converted.
+     * @return Hexadecimal value of inputted decimal.
      */
     public Hexadecimal decimalToHexadecimal(Decimal decimal) {
         int remainder;
         String hexadecimal = "";
-        char hex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        char[] hex = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         while (((int)decimal.getDecimal()) > 0) {
             remainder = ((int) decimal.getDecimal()) % 16;
             hexadecimal = hex[remainder] + hexadecimal;
@@ -56,10 +87,10 @@ public class HexadecimalCalculator extends NumericCalculator implements Hexadeci
     }
 
     /**
-     * Converts hexadecimal to decimal
+     * Converts hexadecimal to decimal.
      *
-     * @param hexadecimal
-     * @return decimal
+     * @param hexadecimal hexadecimal to be converted.
+     * @return Decimal value of inputted decimal.
      */
     public Decimal hexadecimalToDecimal(Hexadecimal hexadecimal) {
         String digits = "0123456789ABCDEF";
@@ -70,6 +101,6 @@ public class HexadecimalCalculator extends NumericCalculator implements Hexadeci
             int d = digits.indexOf(c);
             decimal = 16 * decimal + d;
         }
-        return new Decimal((double) decimal);
+        return new Decimal(decimal);
     }
 }
